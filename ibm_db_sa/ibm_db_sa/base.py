@@ -31,7 +31,7 @@ from . import reflection as ibm_reflection
 
 from sqlalchemy.types import BLOB, CHAR, CLOB, DATE, DATETIME, INTEGER,\
     SMALLINT, BIGINT, DECIMAL, NUMERIC, REAL, TIME, TIMESTAMP,\
-    VARCHAR, FLOAT
+    VARCHAR, FLOAT, DateTime
 
 SA_Version = [int(ver_token) for ver_token in SA_Version.split('.')[0:2]]
 
@@ -194,6 +194,7 @@ ischema_names = {
     'FLOAT': FLOAT,
     'TIME': TIME,
     'TIMESTAMP': TIMESTAMP,
+    "TIMESTMP": DateTime,
     'VARCHAR': VARCHAR,
     'LONGVARCHAR': LONGVARCHAR,
     'XML': XML,
