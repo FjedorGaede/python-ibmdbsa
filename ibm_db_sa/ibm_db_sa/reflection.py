@@ -785,6 +785,7 @@ class OS390Reflector(BaseReflector):
         Column("NAME", CoerceUnicode, key="colname"),
         Column("COLNO", sa_types.Integer, key="colno"),
         Column("TYPENAME", CoerceUnicode, key="typename"),
+        Column("COLTYPE", CoerceUnicode, key="coltype"),
         Column("LENGTH", sa_types.Integer, key="length"),
         Column("SCALE", sa_types.Integer, key="scale"),
         Column("DEFAULT", CoerceUnicode, key="defaultval"),
@@ -878,7 +879,7 @@ class OS390Reflector(BaseReflector):
         query = sql.select([syscols.c.colname, syscols.c.typename,
                             syscols.c.defaultval, syscols.c.nullable,
                             syscols.c.length, syscols.c.scale,
-                            syscols.c.generated],
+                            syscols.c.generated, syscols.c.coltype],
               sql.and_(
                   syscols.c.tabschema == current_schema,
                   syscols.c.tabname == table_name
@@ -888,6 +889,12 @@ class OS390Reflector(BaseReflector):
         sa_columns = []
         for r in connection.execute(query):
             coltype = r[1].upper()
+
+            # Check if typename was set correctly. In Db2 version 5 and older TYPENAME did not exist. Then one has to use the COLTYPE column. (cf. documentation SYSCOLUMNS.TYPENAME)
+            if coltype == '':
+                coltype = r[7].upper().rstrip()
+
+
             if coltype in ['DECIMAL', 'NUMERIC']:
                 coltype = self.ischema_names.get(coltype)(int(r[4]), int(r[5]))
             elif coltype in ['CHARACTER', 'CHAR', 'VARCHAR',
